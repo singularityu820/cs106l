@@ -14,7 +14,7 @@
 #include <string>
 #include <unordered_set>
 
-std::string kYourName = "STUDENT TODO"; // Don't forget to change this!
+std::string kYourName = "Bosen Miao"; // Don't forget to change this!
 
 /**
  * Takes in a file name and returns a set containing all of the applicant names as a set.
@@ -27,8 +27,17 @@ std::string kYourName = "STUDENT TODO"; // Don't forget to change this!
  * below it) to use a `std::unordered_set` instead. If you do so, make sure
  * to also change the corresponding functions in `utils.h`.
  */
-std::set<std::string> get_applicants(std::string filename) {
-  // STUDENT TODO: Implement this function.
+
+std::set<std::string> get_applicants(const std::string& filename) {
+  std::set<std::string> names;
+  std::ifstream file(filename);
+  if (!file) return names;
+
+  for (std::string line; std::getline(file, line); ) {
+    if (!line.empty())
+      names.insert(std::move(line));
+  }
+  return names;
 }
 
 /**
@@ -39,8 +48,32 @@ std::set<std::string> get_applicants(std::string filename) {
  * @param students  The set of student names.
  * @return          A queue containing pointers to each matching name.
  */
-std::queue<const std::string*> find_matches(std::string name, std::set<std::string>& students) {
-  // STUDENT TODO: Implement this function.
+
+// Helper function to get initials (first letter of first and last word)
+std::string get_initials(const std::string& name) {
+  std::string initials;
+  size_t first = name.find_first_not_of(' ');
+  if (first != std::string::npos) {
+    initials += std::toupper(name[first]);
+    size_t last_space = name.find_last_of(' ');
+    if (last_space != std::string::npos && last_space + 1 < name.size()) {
+      initials += std::toupper(name[last_space + 1]);
+    } else if (name.size() > 1) {
+      initials += std::toupper(name[1]);
+    }
+  }
+  return initials;
+}
+
+std::queue<const std::string*> find_matches(const std::string& name, std::set<std::string>& students) {
+  std::queue<const std::string*> matches;
+  std::string target_initials = get_initials(name);
+  for (const auto& student : students) {
+    if (get_initials(student) == target_initials) {
+      matches.push(&student);
+    }
+  }
+  return matches;
 }
 
 /**
@@ -54,7 +87,20 @@ std::queue<const std::string*> find_matches(std::string name, std::set<std::stri
  *                Will return "NO MATCHES FOUND." if `matches` is empty.
  */
 std::string get_match(std::queue<const std::string*>& matches) {
-  // STUDENT TODO: Implement this function.
+  if (matches.empty()) {
+    return "NO MATCHES FOUND.";
+  }
+
+  // Select the match whose name is lexicographically smallest (alphabetically first)
+  const std::string* best_match = matches.front();
+  matches.pop();
+  while (!matches.empty()) {
+    if (*matches.front() < *best_match) {
+      best_match = matches.front();
+    }
+    matches.pop();
+  }
+  return *best_match;
 }
 
 /* #### Please don't remove this line! #### */
