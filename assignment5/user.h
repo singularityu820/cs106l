@@ -20,6 +20,8 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const User& user);
   User& operator=(const User& user);
+  User& operator+=(User& rhs);
+  bool operator<(const User& rhs) const;
   User(User&& user) = delete;
   User& operator=(User&& user) = delete;
 
