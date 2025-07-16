@@ -13,6 +13,7 @@ namespace cs106l {
 template <typename T> class unique_ptr {
 private:
   /* STUDENT TODO: What data must a unique_ptr keep track of? */
+  T* ptr_;
 
 public:
   /**
@@ -22,7 +23,10 @@ public:
    */
   unique_ptr(T* ptr) {
     /* STUDENT TODO: Implement the constructor */
-    throw std::runtime_error("Not implemented: unique_ptr(T* ptr)");
+    if (!ptr) {
+      throw std::invalid_argument("Pointer cannot be null");
+    }
+    ptr_ = ptr;
   }
 
   /**
@@ -30,7 +34,7 @@ public:
    */
   unique_ptr(std::nullptr_t) {
     /* STUDENT TODO: Implement the nullptr constructor */
-    throw std::runtime_error("Not implemented: unique_ptr(std::nullptr_t)");
+    ptr_ = nullptr;
   }
 
   /**
@@ -45,7 +49,10 @@ public:
    */
   T& operator*() {
     /* STUDENT TODO: Implement the dereference operator */
-    throw std::runtime_error("Not implemented: operator*()");
+    if (!ptr_) {
+      throw std::runtime_error("Dereferencing a null unique_ptr");
+    }
+    return *ptr_;
   }
 
   /**
@@ -53,8 +60,10 @@ public:
    * @return A const reference to the object.
    */
   const T& operator*() const {
-    /* STUDENT TODO: Implement the dereference operator (const) */
-    throw std::runtime_error("Not implemented: operator*() const");
+    if (!ptr_) {
+      throw std::runtime_error("Dereferencing a null unique_ptr");
+    }
+    return *ptr_;
   }
 
   /**
@@ -63,8 +72,11 @@ public:
    * @return A pointer to the object.
    */
   T* operator->() {
-    /* STUDENT TODO: Implement the arrow operator */
-    throw std::runtime_error("Not implemented: operator->()");
+    if (!ptr_) {
+      throw std::runtime_error("Dereferencing a null unique_ptr");
+    }
+    return ptr_;
+    
   }
 
   /**
@@ -73,8 +85,10 @@ public:
    * @return A const pointer to the object.
    */
   const T* operator->() const {
-    /* STUDENT TODO: Implement the arrow operator */
-    throw std::runtime_error("Not implemented: operator->() const");
+    if (!ptr_) {
+      throw std::runtime_error("Dereferencing a null unique_ptr");
+    }
+    return ptr_;
   }
 
   /**
@@ -83,17 +97,29 @@ public:
    * @return `true` if the `unique_ptr` is non-null, `false` otherwise.
    */
   operator bool() const {
-    /* STUDENT TODO: Implement the boolean conversion operator */
-    throw std::runtime_error("Not implemented: operator bool() const");
+    return ptr_ != nullptr;
   }
 
-  /** STUDENT TODO: In the space below, do the following:
-   * - Implement a destructor
-   * - Delete the copy constructor
-   * - Delete the copy assignment operator
-   * - Implement the move constructor
-   * - Implement the move assignment operator
-   */
+  ~unique_ptr() {
+    delete ptr_;
+  }
+
+  unique_ptr(const unique_ptr&) = delete; // Disable copy constructor
+  unique_ptr& operator=(const unique_ptr&) = delete; // Disable copy assignment
+
+  unique_ptr(unique_ptr&& other) noexcept : ptr_(other.ptr_) {
+    other.ptr_ = nullptr;
+  }
+
+  unique_ptr& operator=(unique_ptr&& other) noexcept {
+    if (this != &other) {
+      delete ptr_;
+      ptr_ = other.ptr_;
+      other.ptr_ = nullptr;
+    }
+    return *this;
+  }
+
 };
 
 /**

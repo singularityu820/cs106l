@@ -8,6 +8,9 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
+#include <stdexcept>
+#include <string>
+#include <memory>
 
 #include "unique_ptr.h"
 
@@ -51,8 +54,16 @@ template <typename T> struct ListNode {
  * @return A `unique_ptr` to the head of the list.
  */
 template <typename T> cs106l::unique_ptr<ListNode<T>> create_list(const std::vector<T>& values) {
-  /* STUDENT TODO: Implement this method */
-  throw std::runtime_error("Not implemented: createList");
+    cs106l::unique_ptr<ListNode<T>> head = nullptr;
+    
+    // 使用std::ranges::views::reverse实现逆序遍历（C++20特性）
+    for (const auto& value : values | std::views::reverse) {
+        auto node = cs106l::make_unique<ListNode<T>>(value);
+        node->next = std::move(head);
+        head = std::move(node);
+    }
+    
+    return head;
 }
 
 /**
