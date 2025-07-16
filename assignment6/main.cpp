@@ -3,7 +3,9 @@
  * Created by Haven Whitney with modifications by Jacob Roberts-Baca and Fabio
  * Ibanez.
  */
-
+#include <optional>
+#include <iostream>
+#include <string>
 #include <algorithm>
 #include <type_traits>
 #include <vector>
@@ -52,10 +54,15 @@ public:
    * @param course_title The title of the course to find.
    * @return You will need to figure this out!
    */
-  FillMeIn find_course(std::string course_title)
+  std::optional<Course> find_course(std::string course_title)
   {
-    /* STUDENT_TODO: Implement this method! You will need to change the return
-     * type. */
+    auto course = std::find_if(courses.begin(), courses.end(), [&course_title](Course course) {
+      return course.title == course_title;
+    });
+    if (course != courses.end()) {
+      return *course;
+    }
+    return std::nullopt;
   }
 
 private:
@@ -81,7 +88,9 @@ main(int argc, char* argv[])
     Please pay special attention to the README here
     ********************************************************/
 
-    std::string output = /* STUDENT_TODO */
+    std::string output = course.transform([] (Course course) {
+      return "Found course: " + course.title + "," + course.number_of_units + "," + course.quarter;
+    }).value_or("Course not found.");
 
     /********************************************************
      DO NOT MODIFY ANYTHING BELOW THIS LINE PLEASE
