@@ -11,12 +11,8 @@ template <typename Iterator, typename UnaryPred>
 std::vector<Iterator> find_all(Iterator begin, Iterator end, UnaryPred pred);
 
 Corpus tokenize(std::string& source) {
-  int c = ' ';
   Corpus tokens;
-  auto begin = source.begin();
-  auto end = source.end();
-  auto is_space = [](char ch) { return std::isspace(static_cast<unsigned char>(ch)); };
-  auto iters = find_all(begin, end, is_space);
+  auto iters = find_all(source.begin(), source.end(), isspace);
   std::transform(iters.begin(), iters.end() - 1, iters.begin() + 1, std::inserter(tokens,tokens.begin()),
                  [&](auto it1, auto it2) { return Token(source, it1, it2); });
   std::erase_if(tokens, [](const Token& t) { return t.content.empty(); });
